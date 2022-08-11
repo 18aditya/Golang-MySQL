@@ -11,7 +11,7 @@ func Connect() *sql.DB {
 	db, err := sql.Open("mysql", "root:admin2021@tcp(127.0.0.1:3306)/adit_schema")
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("asdasdasda ? ", err)
 	}
 
 	return db
