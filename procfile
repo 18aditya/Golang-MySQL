@@ -1,1 +1,1 @@
-web: rest-go-demo
+web: bundle exec thin start -p $PORT
