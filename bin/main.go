@@ -21,9 +21,15 @@ func main() {
 	router.HandleFunc("/posts", service.UpdatePost).Methods("PUT")
 	router.HandleFunc("/users", service.GetAllUser).Methods("GET")
 	router.HandleFunc("/users", service.InsertUser).Methods("POST")
+	router.HandleFunc("/", Initial).Methods("GET")
 
 	http.Handle("/", router)
-	fmt.Println("Connected to port 1234")
+
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 
+}
+
+func Initial(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Connection Established")
 }
