@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -21,7 +22,7 @@ func ValidateJWT(next func(w http.ResponseWriter, r *http.Request)) http.Handler
 
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte("not authorized: " + err.Error()))
+				w.Write([]byte("not authorized: " + strconv.FormatBool(token.Valid)))
 			}
 
 			if token.Valid {
