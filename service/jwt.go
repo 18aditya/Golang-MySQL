@@ -33,8 +33,9 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	var (
 		response model.Response
 	)
+	APIKey := os.Getenv("API_KEY")
 	if r.Header["Authorization"] != nil {
-		if r.Header["Authorization"][0] != os.Getenv("API_KEY") {
+		if r.Header["Authorization"][0] != APIKey {
 
 			response.Status = 401
 			response.Message = "Api Key is wrong"
