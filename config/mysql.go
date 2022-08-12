@@ -8,10 +8,10 @@ import (
 )
 
 func Connect() *sql.DB {
-	db, err := sql.Open("mysql", "root:admin2021@tcp(127.0.0.1:3306)/adit_schema")
+	db, err := sql.Open("mysql", "mysql://b6e87f3c439c25:dd7a6506@us-cdbr-east-06.cleardb.net/heroku_c5002e639cb82ea?reconnect=true")
 
 	if err != nil {
-		log.Fatal("asdasdasda ? ", err)
+		log.Fatal(err)
 	}
 
 	return db
