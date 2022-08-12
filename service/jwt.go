@@ -53,19 +53,19 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(response)
 		} else {
 			token, err := CreateJWT()
-
 			if err != nil {
 				response.Status = 401
 				response.Message = "Api Key is wrong"
 
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(response)
-			}
-			response.Status = 200
-			response.Message = fmt.Sprintf("%s", token)
+			} else {
+				response.Status = 200
+				response.Message = fmt.Sprintf("%s", token)
 
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(response)
+			}
 		}
 	}
 
