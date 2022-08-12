@@ -8,7 +8,7 @@ import (
 )
 
 func Connect() *sql.DB {
-	db, err := sql.Open("mysql", "mysql://b6e87f3c439c25:dd7a6506@us-cdbr-east-06.cleardb.net/heroku_c5002e639cb82ea?reconnect=true")
+	db, err := sql.Open("mysql", "b6e87f3c439c25:dd7a6506@(us-cdbr-east-06.cleardb.net)/heroku_c5002e639cb82ea")
 
 	if err != nil {
 		log.Fatal(err)
