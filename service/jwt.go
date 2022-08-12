@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/joho/godotenv"
 	"main.go/model"
 )
 
@@ -30,17 +29,17 @@ func CreateJWT() (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
-	err := godotenv.Load()
+	// err := godotenv.Load()
 	var (
 		response model.Response
 	)
-	if err != nil {
-		response.Status = 502
-		response.Message = "Something is wrong when generating your token"
+	// if err != nil {
+	// 	response.Status = 502
+	// 	response.Message = "Something is wrong when generating your token"
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	}
+	// 	w.Header().Set("Content-Type", "application/json")
+	// 	json.NewEncoder(w).Encode(response)
+	// }
 
 	if r.Header["Authorization"] != nil {
 		if r.Header["Authorization"][0] != os.Getenv("API_KEY") {
