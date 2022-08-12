@@ -54,8 +54,8 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		} else {
 			token, err := CreateJWT()
 			if err != nil {
-				response.Status = 401
-				response.Message = "Api Key is wrong"
+				response.Status = 403
+				response.Message = fmt.Sprintf("Cannot create token %s", err)
 
 				w.Header().Set("Content-Type", "application/json")
 				json.NewEncoder(w).Encode(response)
