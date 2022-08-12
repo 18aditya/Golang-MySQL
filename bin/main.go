@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -30,6 +30,6 @@ func main() {
 }
 
 func Initial(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, "Connection Established")
 
-	fmt.Println("Connection Established")
 }
