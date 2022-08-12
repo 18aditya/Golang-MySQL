@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -26,7 +27,7 @@ func main() {
 	router.HandleFunc("/", Initial).Methods("GET")
 
 	http.Handle("/", router)
-
+	fmt.Printf("Connection Established")
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 
 }
