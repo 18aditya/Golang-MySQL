@@ -21,7 +21,7 @@ func main() {
 	router.HandleFunc("/posts", service.UpdatePost).Methods("PUT")
 	router.HandleFunc("/users", service.GetAllUser).Methods("GET")
 	router.HandleFunc("/users", service.InsertUser).Methods("POST")
-	router.HandleFunc("", Initial).Methods("GET")
+	router.HandleFunc("/", Initial).Methods("GET")
 
 	http.Handle("/", router)
 
