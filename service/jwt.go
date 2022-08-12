@@ -19,7 +19,7 @@ func CreateJWT() (string, error) {
 
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
 
-	tokenStr, err := token.SignedString(os.Getenv("SECRET"))
+	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
 		fmt.Println(err.Error())
