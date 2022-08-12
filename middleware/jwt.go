@@ -10,6 +10,7 @@ import (
 
 func ValidateJWT(next func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Header["Token"] != nil {
 			token, err := jwt.Parse(r.Header["Token"][0], func(t *jwt.Token) (interface{}, error) {
 				_, ok := t.Method.(*jwt.SigningMethodHMAC)
@@ -17,7 +18,7 @@ func ValidateJWT(next func(w http.ResponseWriter, r *http.Request)) http.Handler
 					w.WriteHeader(http.StatusUnauthorized)
 					w.Write([]byte("not authorized"))
 				}
-				return os.Getenv("SECRET"), nil
+				return []byte(os.Getenv("SECRET")), nil
 			})
 
 			if err != nil {
