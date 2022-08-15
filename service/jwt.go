@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -30,6 +31,8 @@ func CreateJWT() (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
+	var user model.Users
+	// var arr_user []model.Users
 
 	var (
 		response model.Response
@@ -41,29 +44,35 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	sql := fmt.Sprintf("Select Id from Users Where IdUsers = %s", r.Header["Authorization"])
 
 	if r.Header["Authorization"] != nil {
-		rows, err := db.Exec(sql)
-		if err != nil || rows == nil {
-			response.Status = 404
-			response.Message = "user not found"
-
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
+		rows, err := db.Query(sql)
+		if err != nil {
+			log.Print(err)
 		} else {
-			token, err := CreateJWT()
-			if err != nil {
-				response.Status = 403
-				response.Message = fmt.Sprintf("Cannot create token %s", err)
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			} else {
-				response.Status = 200
-				response.Message = fmt.Sprintf("%s", token)
+			for rows.Next() {
+				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
+					response.Status = 404
+					response.Message = "user not found"
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode(response)
+				} else {
+					token, err := CreateJWT()
+					if err != nil {
+						response.Status = 403
+						response.Message = fmt.Sprintf("Cannot create token %s", err)
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					} else {
+						response.Status = 200
+						response.Message = fmt.Sprintf("%s", token)
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					}
+				}
 			}
 		}
 	}
-
 }
