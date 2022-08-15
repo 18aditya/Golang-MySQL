@@ -52,7 +52,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 		} else {
 			for rows.Next() {
-				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
+				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err == nil {
 					response.Status = 404
 					response.Message = fmt.Sprintf("%s", err)
 
