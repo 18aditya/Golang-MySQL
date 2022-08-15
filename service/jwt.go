@@ -46,7 +46,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		err := db.QueryRow(sql)
 		if err != nil {
 			response.Status = 404
-			response.Message = "user not found"
+			response.Message = fmt.Sprintf("%s", err)
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
