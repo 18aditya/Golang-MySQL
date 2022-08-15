@@ -37,6 +37,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		response model.Response
 	)
 	key := r.Header["Authorization"]
+
 	db := config.Connect()
 	defer db.Close()
 
@@ -46,7 +47,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(sql)
 		if err != nil {
 			response.Status = 404
-			response.Message = fmt.Sprintf("Cannot create token %s", err)
+			response.Message = fmt.Sprintf("Cannot create token %s", key)
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
