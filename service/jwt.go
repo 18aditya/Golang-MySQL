@@ -45,7 +45,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
-		if err != nil || rows == nil {
+		if err != nil || rows != nil {
 			response.Status = 404
 			response.Message = fmt.Sprint("user not found ", rows)
 
