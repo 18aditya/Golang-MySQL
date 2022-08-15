@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"main.go/config"
 	"main.go/model"
 )
 
@@ -29,23 +30,19 @@ func CreateJWT() (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
-	// err := godotenv.Load()
+
 	var (
 		response model.Response
 	)
-	// if err != nil {
-	// 	response.Status = 502
-	// 	response.Message = "Something is wrong when generating your token"
 
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	json.NewEncoder(w).Encode(response)
-	// }
+	db := config.Connect()
+	defer db.Close()
 
 	if r.Header["Authorization"] != nil {
-		if r.Header["Authorization"][0] != os.Getenv("API_KEY") {
-
-			response.Status = 401
-			response.Message = "Api Key is wrong"
+		rows, err := db.Query("Select Id from Users Where IdUsers = 1 ")
+		if err != nil || rows == nil {
+			response.Status = 404
+			response.Message = "user not found"
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
