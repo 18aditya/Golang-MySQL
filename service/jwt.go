@@ -31,24 +31,23 @@ func CreateJWT(key string) (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
-	// var user model.Users
+	var user model.Users
 	// var arr_user []model.Users
 
 	var (
 		response model.Response
-		enough   bool
+		// enough   bool
 	)
 	key := r.Header["Authorization"][0]
 	db := config.Connect()
 	defer db.Close()
-	sql_query := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
+	sql := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
 
-		if err := db.QueryRow("Select * FROM Users WHERE Users.IdUsers = ?", key).Scan(&enough); err != nil {
-
+		if err := db.QueryRow(sql).Scan(&user.Id); err != nil {
 			response.Status = 404
-			response.Message = sql_query
+			response.Message = sql
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
