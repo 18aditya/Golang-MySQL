@@ -46,7 +46,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
 		for rows.Next() {
-			if null := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); null != nil || err != nil {
+			if null := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); null == nil || err != nil {
 				response.Status = 404
 				response.Message = fmt.Sprintf("user not found %s", null)
 
@@ -69,5 +69,13 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
+	} else {
+
+		response.Status = 404
+		response.Message = fmt.Sprintf("user not found:")
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
 	}
 }
