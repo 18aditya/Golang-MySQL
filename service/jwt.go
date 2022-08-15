@@ -47,8 +47,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(sql)
 		if err != nil {
 			response.Status = 404
-			response.Message = fmt.Sprint("user not found ", rows)
-
+			response.Message = "user not found"
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
@@ -56,7 +55,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 			for rows.Next() {
 				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
 					response.Status = 404
-					response.Message = fmt.Sprint("user not found ", rows)
+					response.Message = "user not found"
 
 					w.Header().Set("Content-Type", "application/json")
 					json.NewEncoder(w).Encode(response)
@@ -65,7 +64,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 					token, err := CreateJWT(key)
 					if err != nil {
 						response.Status = 403
-						response.Message = fmt.Sprintf("Cannot create token %s", err)
+						response.Message = "Cannot create token"
 
 						w.Header().Set("Content-Type", "application/json")
 						json.NewEncoder(w).Encode(response)
