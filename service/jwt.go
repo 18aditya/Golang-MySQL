@@ -8,15 +8,17 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"main.go/config"
 	"main.go/model"
 )
 
-func CreateJWT() (string, error) {
+func CreateJWT(key string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
+	claims["id"] = key
 
 	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
@@ -29,28 +31,28 @@ func CreateJWT() (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
-	// err := godotenv.Load()
+	// var user model.Users
+	// var arr_user []model.Users
+
 	var (
 		response model.Response
 	)
-	// if err != nil {
-	// 	response.Status = 502
-	// 	response.Message = "Something is wrong when generating your token"
+	key := r.Header["Authorization"][0]
+	db := config.Connect()
+	defer db.Close()
 
-	// 	w.Header().Set("Content-Type", "application/json")
-	// 	json.NewEncoder(w).Encode(response)
-	// }
+	sql := fmt.Sprintf("Select IdUsers from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
-		if r.Header["Authorization"][0] != os.Getenv("API_KEY") {
-
-			response.Status = 401
-			response.Message = "Api Key is wrong"
+		rows, err := db.Query(sql)
+		if err != nil || rows == nil {
+			response.Status = 404
+			response.Message = fmt.Sprintf("user not found")
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 		} else {
-			token, err := CreateJWT()
+			token, err := CreateJWT(key)
 			if err != nil {
 				response.Status = 403
 				response.Message = fmt.Sprintf("Cannot create token %s", err)
@@ -65,6 +67,6 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(response)
 			}
 		}
-	}
 
+	}
 }
