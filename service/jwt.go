@@ -36,7 +36,6 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		response model.Response
-		// enough   bool
 	)
 	key := r.Header["Authorization"][0]
 	db := config.Connect()
@@ -44,30 +43,41 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	sql := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
-
-		if err := db.QueryRow(sql).Scan(&user.Id); err != nil {
+		rows, err := db.Query(sql)
+		if err != nil {
 			response.Status = 404
-			response.Message = sql
+			response.Message = "user not found"
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
 		} else {
-			token, err := CreateJWT(key)
-			if err != nil {
-				response.Status = 403
-				response.Message = "Cannot create token"
+			for rows.Next() {
+				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
+					response.Status = 404
+					response.Message = fmt.Sprintf("%s", err)
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			} else {
-				response.Status = 200
-				response.Message = fmt.Sprintf("%s", token)
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode(response)
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
+				} else {
+					token, err := CreateJWT(key)
+					if err != nil {
+						response.Status = 403
+						response.Message = "Cannot create token"
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					} else {
+						response.Status = 200
+						response.Message = fmt.Sprintf("%s", token)
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					}
+				}
 			}
-		}
 
+		}
 	} else {
 		response.Status = 402
 		response.Message = "Insert user Id"
