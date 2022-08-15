@@ -46,7 +46,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	if r.Header["Authorization"] != nil {
 
-		if err := db.QueryRow("Select * from Users Where IdUsers = ?", key).Scan(&enough); err != nil {
+		if err := db.QueryRow("Select * FROM Users WHERE Users.IdUsers = ?", key).Scan(&enough); err != nil {
 			if err == sql.ErrNoRows {
 				response.Status = 404
 				response.Message = sql_query
