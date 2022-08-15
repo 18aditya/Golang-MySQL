@@ -52,6 +52,12 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
+		} else if err != nil || err != sql.ErrNoRows {
+			response.Status = 404
+			response.Message = fmt.Sprintf(err.Error())
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+
 		} else {
 
 			token, err := CreateJWT(key)
