@@ -36,7 +36,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	var (
 		response model.Response
 	)
-	key := r.Header["Authorization"][0]
+	key := "100000000000"
 	db := config.Connect()
 	defer db.Close()
 
