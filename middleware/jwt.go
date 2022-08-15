@@ -26,7 +26,8 @@ func ValidateJWT(next func(w http.ResponseWriter, r *http.Request)) http.Handler
 			}
 
 			if token.Valid {
-				next(w, r)
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(r.Header["Token"][0]))
 			}
 		} else {
 			w.WriteHeader(http.StatusUnauthorized)
