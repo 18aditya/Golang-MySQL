@@ -47,7 +47,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(sql)
 		if err != nil {
 			response.Status = 404
-			response.Message = fmt.Sprintf("Cannot create token %s", key)
+			response.Message = fmt.Sprint("Cannot create token ?", key)
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
