@@ -36,18 +36,18 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	var (
 		response model.Response
 	)
-	key := r.Header["Authorization"]
+	key := r.Header["Authorization"][0]
 
 	db := config.Connect()
 	defer db.Close()
 
-	sql := fmt.Sprintf("Select IdUsers from Users Where IdUsers = %s", key)
+	sql := fmt.Sprintf("Select IdUsers from Users Where IdUsers = %s ", key)
 
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
 		if err != nil {
 			response.Status = 404
-			response.Message = fmt.Sprint("Cannot create token ?", key)
+			response.Message = fmt.Sprint("Cannot create token ", key)
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
