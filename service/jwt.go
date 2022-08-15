@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -41,13 +42,20 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	key := r.Header["Authorization"][0]
 	db := config.Connect()
 	defer db.Close()
-	sql := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
+	sql_query := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
 
-		if err := db.QueryRow(sql).Scan(&enough); err != nil {
+		if err := db.QueryRow(sql_query).Scan(&enough); err != nil {
+			if err == sql.ErrNoRows {
+				response.Status = 404
+				response.Message = sql_query
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(response)
+
+			}
 			response.Status = 404
-			response.Message = "User not found"
+			response.Message = sql_query
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
