@@ -38,8 +38,10 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
+	sql := fmt.Sprintf("Select Id from Users Where IdUsers = %s", r.Header["Authorization"])
+
 	if r.Header["Authorization"] != nil {
-		rows, err := db.Query("Select Id from Users Where IdUsers = 1 ")
+		rows, err := db.Query(sql)
 		if err != nil || rows == nil {
 			response.Status = 404
 			response.Message = "user not found"
