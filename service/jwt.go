@@ -1,7 +1,6 @@
 package service
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -47,13 +46,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	if r.Header["Authorization"] != nil {
 
 		if err := db.QueryRow("Select * FROM Users WHERE Users.IdUsers = ?", key).Scan(&enough); err != nil {
-			if err == sql.ErrNoRows {
-				response.Status = 404
-				response.Message = sql_query
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
 
-			}
 			response.Status = 404
 			response.Message = sql_query
 			w.Header().Set("Content-Type", "application/json")
