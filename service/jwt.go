@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -31,7 +32,7 @@ func CreateJWT(key string) (string, error) {
 }
 
 func GetJWT(w http.ResponseWriter, r *http.Request) {
-	// var user model.Users
+	var user model.Users
 	// var arr_user []model.Users
 
 	var (
@@ -41,32 +42,46 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	sql := fmt.Sprintf("Select IdUsers from Users Where IdUsers = %s", key)
+	sql := fmt.Sprintf("Select * from Users")
 
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
-		if err != nil || rows != nil {
-			response.Status = 404
-			response.Message = fmt.Sprint("user not found ", rows)
-
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
+		if err != nil {
+			log.Print(err)
 		} else {
-			token, err := CreateJWT(key)
-			if err != nil {
-				response.Status = 403
-				response.Message = fmt.Sprintf("Cannot create token %s", err)
+			for rows.Next() {
+				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
+					response.Status = 404
+					response.Message = fmt.Sprint("user not found ", rows)
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			} else {
-				response.Status = 200
-				response.Message = fmt.Sprintf("%s", token)
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode(response)
 
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
+				} else {
+					token, err := CreateJWT(key)
+					if err != nil {
+						response.Status = 403
+						response.Message = fmt.Sprintf("Cannot create token %s", err)
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					} else {
+						response.Status = 200
+						response.Message = fmt.Sprintf("%s", token)
+
+						w.Header().Set("Content-Type", "application/json")
+						json.NewEncoder(w).Encode(response)
+					}
+				}
 			}
-		}
 
+		}
+	} else {
+		response.Status = 402
+		response.Message = "Insert user Id"
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
+
 }
