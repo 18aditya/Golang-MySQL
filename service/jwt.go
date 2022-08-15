@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -47,7 +46,12 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
 		if err != nil {
-			log.Print(err)
+			response.Status = 404
+			response.Message = fmt.Sprint("user not found ", rows)
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+
 		} else {
 			for rows.Next() {
 				if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
