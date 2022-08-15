@@ -42,7 +42,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	sql := fmt.Sprintf("Select * from Users")
+	sql := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
 		rows, err := db.Query(sql)
