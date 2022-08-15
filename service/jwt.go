@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -18,8 +18,9 @@ func CreateJWT(key string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
+	claims["id"] = key
 
-	tokenStr, err := token.SignedString([]byte(key))
+	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -36,7 +37,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	var (
 		response model.Response
 	)
-	key := "100000000000"
+	key := r.Header["Authorization"][0]
 	db := config.Connect()
 	defer db.Close()
 
