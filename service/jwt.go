@@ -36,6 +36,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 
 	var (
 		response model.Response
+		enough   bool
 	)
 	key := r.Header["Authorization"][0]
 	db := config.Connect()
@@ -43,10 +44,10 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 	sql := fmt.Sprintf("Select * from Users Where IdUsers = %s", key)
 
 	if r.Header["Authorization"] != nil {
-		err := db.QueryRow(sql)
-		if err != nil {
+
+		if err := db.QueryRow(sql).Scan(&enough); err != nil {
 			response.Status = 404
-			response.Message = fmt.Sprintf("%s", err.Err())
+			response.Message = "User not found"
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 
