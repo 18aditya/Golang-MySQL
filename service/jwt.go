@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
+
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -12,14 +12,14 @@ import (
 	"main.go/model"
 )
 
-func CreateJWT() (string, error) {
+func CreateJWT(key string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["exp"] = time.Now().Add(time.Hour).Unix()
 
-	tokenStr, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	tokenStr, err := token.SignedString([]byte(key))
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -51,7 +51,7 @@ func GetJWT(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(response)
 		} else {
-			token, err := CreateJWT()
+			token, err := CreateJWT(key)
 			if err != nil {
 				response.Status = 403
 				response.Message = fmt.Sprintf("Cannot create token %s", err)
