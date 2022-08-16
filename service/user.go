@@ -10,6 +10,7 @@ import (
 	"regexp"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	"main.go/config"
 	"main.go/model"
 )
@@ -188,6 +189,51 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 
+}
+
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+
+	var user model.Users
+	var arr_user []model.Users
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	db := config.Connect()
+	defer db.Close()
+
+	rows, err := db.Query("Select * from Users Where IdUsers = ?", id)
+
+	if err != nil {
+		log.Print(err)
+	} else {
+
+		if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
+			log.Fatal(err.Error())
+
+		} else {
+			var post model.Posts
+			var arr_post []model.Posts
+			rows, err := db.Query("Select Id,Title,Description FROM Posts WHERE Posts.UserId = ? ORDER BY ID", user.Id)
+			if err != nil {
+				log.Print(err)
+			}
+
+			for rows.Next() {
+				if err := rows.Scan(&post.Id, &post.Title, &post.Description); err != nil {
+					log.Fatal(err.Error())
+
+				} else {
+					arr_post = append(arr_post, post)
+				}
+			}
+
+			user.Posts = arr_post
+			arr_user = append(arr_user, user)
+		}
+
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(arr_user)
 }
 
 // func DeletePost(w http.ResponseWriter, r *http.Request) {
