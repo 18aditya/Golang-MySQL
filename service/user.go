@@ -198,7 +198,7 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	var arr_user []model.Users
 	vars := mux.Vars(r)
 	id := vars["id"]
-
+	fmt.Print(id)
 	db := config.Connect()
 	defer db.Close()
 
