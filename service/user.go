@@ -230,9 +230,11 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 
 		user.Posts = arr_post
 		arr_user = append(arr_user, user)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(arr_user)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(arr_user)
+
 }
 
 // func DeletePost(w http.ResponseWriter, r *http.Request) {
