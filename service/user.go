@@ -198,11 +198,11 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	var arr_user []model.Users
 	vars := mux.Vars(r)
 	id := vars["id"]
-	fmt.Print(id)
+
 	db := config.Connect()
 	defer db.Close()
 
-	sql_query := fmt.Sprint("Select * from Users Where IdUsers = ?", id)
+	sql_query := fmt.Sprint("Select * from Users Where IdUsers = ", id)
 	rows := db.QueryRow(sql_query)
 	err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt)
 	if err != nil && err == sql.ErrNoRows {
