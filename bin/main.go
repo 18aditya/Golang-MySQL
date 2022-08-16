@@ -28,7 +28,7 @@ func main() {
 	router.HandleFunc("/", Initial).Methods("GET")
 
 	http.Handle("/", router)
-	fmt.Printf("Connection Established")
+	fmt.Printf("Connection Established in %s", os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 
 }
