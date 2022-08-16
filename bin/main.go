@@ -24,7 +24,7 @@ func main() {
 	router.Handle("/users", middleware.ValidateJWT(service.GetAllUser)).Methods("GET")
 	router.Handle("/users/{id}", middleware.ValidateJWT(service.GetUserById)).Methods("GET")
 	router.Handle("/users", middleware.ValidateJWT(service.InsertUser)).Methods("POST")
-	router.HandleFunc("/jwt", service.GetJWT)
+	router.HandleFunc("/jwt/{id}", service.GetJWT)
 	router.HandleFunc("/", Initial).Methods("GET")
 
 	http.Handle("/", router)

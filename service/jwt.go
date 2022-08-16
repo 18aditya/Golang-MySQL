@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 	"main.go/config"
 	"main.go/model"
 )
@@ -34,48 +35,41 @@ func CreateJWT(key string) (string, error) {
 func GetJWT(w http.ResponseWriter, r *http.Request) {
 	var user model.Users
 	// var arr_user []model.Users
-
+	vars := mux.Vars(r)
+	key := vars["id"]
 	var (
 		response model.Response
 	)
-	key := r.Header["Authorization"][0]
+	// key := r.Header["Authorization"][0]
 	db := config.Connect()
 	defer db.Close()
 	sql_query := fmt.Sprint("Select * from Users Where IdUsers = ", key)
 
-	if r.Header["Authorization"] != nil {
-		rows := db.QueryRow(sql_query)
-		err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt)
-		if err != nil && err == sql.ErrNoRows {
-			response.Status = 404
-			response.Message = "user not found"
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(response)
-
-		} else {
-
-			token, err := CreateJWT(key)
-			if err != nil {
-				response.Status = 403
-				response.Message = "Cannot create token"
-
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			} else {
-				response.Status = 200
-				response.Message = fmt.Sprintf("%s", token)
-
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
-			}
-
-		}
-	} else {
-		response.Status = 402
-		response.Message = "Insert user Id"
-
+	rows := db.QueryRow(sql_query)
+	err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt)
+	if err != nil && err == sql.ErrNoRows {
+		response.Status = 404
+		response.Message = "user not found"
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(response)
+
+	} else {
+
+		token, err := CreateJWT(key)
+		if err != nil {
+			response.Status = 403
+			response.Message = "Cannot create token"
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		} else {
+			response.Status = 200
+			response.Message = fmt.Sprintf("%s", token)
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}
+
 	}
 
 }
