@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -192,7 +193,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
-
+	var response model.Response
 	var user model.Users
 	var arr_user []model.Users
 	vars := mux.Vars(r)
@@ -201,36 +202,34 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	db := config.Connect()
 	defer db.Close()
 
-	rows, err := db.Query("Select * from Users Where IdUsers = ?", id)
+	sql_query := fmt.Sprint("Select * from Users Where IdUsers = ?", id)
+	rows := db.QueryRow(sql_query)
+	err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt)
+	if err != nil && err == sql.ErrNoRows {
+		response.Status = 404
+		response.Message = "user not found"
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 
-	if err != nil {
-		log.Print(err)
 	} else {
-
-		if err := rows.Scan(&user.Id, &user.First_name, &user.Last_name, &user.Email, &user.CreatedAt); err != nil {
-			log.Fatal(err.Error())
-
-		} else {
-			var post model.Posts
-			var arr_post []model.Posts
-			rows, err := db.Query("Select Id,Title,Description FROM Posts WHERE Posts.UserId = ? ORDER BY ID", user.Id)
-			if err != nil {
-				log.Print(err)
-			}
-
-			for rows.Next() {
-				if err := rows.Scan(&post.Id, &post.Title, &post.Description); err != nil {
-					log.Fatal(err.Error())
-
-				} else {
-					arr_post = append(arr_post, post)
-				}
-			}
-
-			user.Posts = arr_post
-			arr_user = append(arr_user, user)
+		var post model.Posts
+		var arr_post []model.Posts
+		rows, err := db.Query("Select Id,Title,Description FROM Posts WHERE Posts.UserId = ? ORDER BY ID", user.Id)
+		if err != nil {
+			log.Print(err)
 		}
 
+		for rows.Next() {
+			if err := rows.Scan(&post.Id, &post.Title, &post.Description); err != nil {
+				log.Fatal(err.Error())
+
+			} else {
+				arr_post = append(arr_post, post)
+			}
+		}
+
+		user.Posts = arr_post
+		arr_user = append(arr_user, user)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(arr_user)
